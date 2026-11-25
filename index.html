@@ -8,9 +8,11 @@
 #mmIntroVideo{width:100%;height:100%;object-fit:contain;display:block}
 #mmIntroSkip{position:absolute;right:24px;bottom:24px;padding:10px 18px;background:#000a;color:#fff;border:1px solid #ffffff70;border-radius:8px;cursor:pointer}
 #mmIntroSkip:hover{background:#333}
+#mmIntroStart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);padding:16px 32px;background:#183a30;color:#fff;border:1px solid #6ee7b7;border-radius:9px;font-size:18px;cursor:pointer}
 </style>
 <div id="mmIntro" role="dialog" aria-label="Introdução do Miniface Manager">
-<video id="mmIntroVideo" autoplay muted playsinline preload="auto" src="./intro.mp4"></video>
+<video id="mmIntroVideo" autoplay playsinline preload="auto" src="./intro.mp4"></video>
+<button id="mmIntroStart" type="button" hidden>Reproduzir intro com som</button>
 <button id="mmIntroSkip" type="button">Pular intro</button>
 </div>
 <script>
@@ -22,7 +24,10 @@
  function escapeIntro(e){if(e.key==='Escape')close();}
  function watchdog(){clearTimeout(timer);timer=setTimeout(close,10000);}
  skip.addEventListener('click',close);video.addEventListener('ended',close);video.addEventListener('error',close);video.addEventListener('playing',()=>clearTimeout(timer));video.addEventListener('waiting',watchdog);video.addEventListener('stalled',watchdog);document.addEventListener('keydown',escapeIntro);watchdog();
- video.muted=true;const playing=video.play();if(playing)playing.catch(close);
+ const start=document.getElementById('mmIntroStart');
+ video.muted=false;video.volume=1;
+ function playWithSound(){start.hidden=true;watchdog();video.muted=false;const playing=video.play();if(playing)playing.catch(()=>{if(!overlay.isConnected)return;clearTimeout(timer);if(video.error){close();return;}start.hidden=false;});}
+ start.addEventListener('click',playWithSound);playWithSound();
 })();
 </script>
 <main>
